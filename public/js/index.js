@@ -1,6 +1,7 @@
 let transactions = [];
 let myChart;
 
+
 fetch("/api/transaction")
   .then(response => {
     return response.json();
@@ -107,12 +108,13 @@ function sendTransaction(isAdding) {
   // add to beginning of current array of data
   transactions.unshift(transaction);
 
-  // re-run logic to populate ui with new record
+  // re-run logic to populate ui with new recor
   populateChart();
   populateTable();
   populateTotal();
   
-  // also send to server
+  if (navigator.onLine) {
+  // send to server
   fetch("/api/transaction", {
     method: "POST",
     body: JSON.stringify(transaction),
@@ -135,13 +137,19 @@ function sendTransaction(isAdding) {
     }
   })
   .catch(err => {
-    // fetch failed, so save in indexed db
+    // fetch failed, so save in db
     saveRecord(transaction);
 
-    // clear form
     nameEl.value = "";
     amountEl.value = "";
   });
+} else {
+  saveRecord(transaction);
+
+  nameEl.value = "";
+  amountEl.value = "";
+}
+
 }
 
 document.querySelector("#add-btn").onclick = function() {
